@@ -25,13 +25,13 @@ const logIDKey contextKey = "__log_id__"
 func GetContextWithLogID(ctx context.Context, logID string) context.Context {
 	now := time.Now().Unix()
 	logID = fmt.Sprintf("%s_%d", logID, now)
-	return GetContextWithLogIDWithoutSubfix(ctx, logID)
+	return GetContextWithNoSubfixLogID(ctx, logID)
 
 }
 
-// GetContextWithLogIDWithoutSubfix is used to setup context
+// GetContextWithNoSubfixLogID is used to setup context
 // and set log ID into it without subfix added.
-func GetContextWithLogIDWithoutSubfix(ctx context.Context, logID string) context.Context {
+func GetContextWithNoSubfixLogID(ctx context.Context, logID string) context.Context {
 	if ctx == nil {
 		ctx = context.Background()
 	}
