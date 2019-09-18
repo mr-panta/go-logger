@@ -5,18 +5,20 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"runtime"
+	"strings"
 	"time"
 )
 
 var logFn func(format string, args ...interface{})
 
-// ContextKey is type for context key.
-type ContextKey string
+// contextKey is type for context key.
+type contextKey string
 
-// ContextValue is type for context value.
-type ContextValue string
+// contextValue is type for context v`alue.
+type contextValue string
 
-const logIDKey ContextKey = "__log_id__"
+const logIDKey contextKey = "__log_id__"
 
 // GetContextWithLogID is used to setup context
 // and set log ID into it.
@@ -26,13 +28,13 @@ func GetContextWithLogID(ctx context.Context, logID string) context.Context {
 	}
 	now := time.Now().Unix()
 	logID = fmt.Sprintf("%s_%d", logID, now)
-	return context.WithValue(ctx, logIDKey, ContextValue(logID))
+	return context.WithValue(ctx, logIDKey, contextValue(logID))
 }
 
 // GetLogID is used to get log ID
 // from context.
 func GetLogID(ctx context.Context) string {
-	logID, ok := ctx.Value(logIDKey).(ContextValue)
+	logID, ok := ctx.Value(logIDKey).(contextValue)
 	if !ok {
 		return ""
 	}
@@ -79,14 +81,18 @@ func getDefaultLogFn() func(format string, args ...interface{}) {
 }
 
 func printf(ctx context.Context, mode, format string, args ...interface{}) {
+	_, filePath, line, _ := runtime.Caller(2)
+	path := strings.Split(filePath, "/")
+	file := path[len(path)-1]
 	if logFn == nil {
 		logFn = getDefaultLogFn()
 	}
-	logFormat := fmt.Sprintf("|%s|%s", mode, format)
+	fileLine := fmt.Sprintf("%s:%d", file, line)
+	logFormat := fmt.Sprintf("|%s|%s|%s", mode, fileLine, format)
 	if ctx != nil {
-		logID, ok := ctx.Value(logIDKey).(ContextValue)
+		logID, ok := ctx.Value(logIDKey).(contextValue)
 		if ok {
-			logFormat = fmt.Sprintf("|%s|log_id=%s|%s", mode, logID, format)
+			logFormat = fmt.Sprintf("|%s|%s|log_id=%s|%s", mode, fileLine, logID, format)
 		}
 	}
 	logFn(logFormat, args...)
