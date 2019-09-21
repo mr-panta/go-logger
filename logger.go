@@ -4,11 +4,13 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"math/rand"
 	"os"
 	"runtime"
 	"strings"
-	"time"
 )
+
+var letterRunes = []rune("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 
 var logFn func(format string, args ...interface{})
 
@@ -23,8 +25,8 @@ const logIDKey contextKey = "__log_id__"
 // GetContextWithLogID is used to setup context
 // and set log ID into it.
 func GetContextWithLogID(ctx context.Context, logID string) context.Context {
-	now := time.Now().Unix()
-	logID = fmt.Sprintf("%s_%d", logID, now)
+	token := randomString(8)
+	logID = fmt.Sprintf("%s_%s", logID, token)
 	return GetContextWithNoSubfixLogID(ctx, logID)
 
 }
@@ -103,4 +105,12 @@ func printf(ctx context.Context, mode, format string, args ...interface{}) {
 		}
 	}
 	logFn(logFormat, args...)
+}
+
+func randomString(n int) string {
+	b := make([]rune, n)
+	for i := range b {
+		b[i] = letterRunes[rand.Intn(len(letterRunes))]
+	}
+	return string(b)
 }
