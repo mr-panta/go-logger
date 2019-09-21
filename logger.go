@@ -8,6 +8,7 @@ import (
 	"os"
 	"runtime"
 	"strings"
+	"time"
 )
 
 var letterRunes = []rune("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
@@ -21,6 +22,10 @@ type contextKey string
 type contextValue string
 
 const logIDKey contextKey = "__log_id__"
+
+func init() {
+	rand.Seed(time.Now().UnixNano())
+}
 
 // GetContextWithLogID is used to setup context
 // and set log ID into it.
