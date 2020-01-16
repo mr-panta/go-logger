@@ -3,7 +3,6 @@ package logger
 import (
 	"context"
 	"fmt"
-	"log"
 	"math/rand"
 	"os"
 	"runtime"
@@ -88,9 +87,8 @@ func Fatalf(ctx context.Context, format string, args ...interface{}) {
 }
 
 func getDefaultLogFn() func(format string, args ...interface{}) {
-	log.SetFlags(log.LstdFlags | log.Lmicroseconds)
 	return func(format string, args ...interface{}) {
-		log.Printf(fmt.Sprintf("\b\b%s", format), args...)
+		fmt.Printf(fmt.Sprintf("%s%s\n", time.Now().Format("2006-01-02 03:04:05.000000"), format), args...)
 	}
 }
 
